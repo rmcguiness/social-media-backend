@@ -1,0 +1,21 @@
+# backend/nodejs/social-media-basic/docker-compose.yml
+version: '3.9'
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: social_media_basic_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: social_media_basic
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d social_media_basic']
+      interval: 3s
+      timeout: 3s
+      retries: 5
+volumes:
+  pgdata:

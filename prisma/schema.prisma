@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  username     String   @unique
+  name         String
+  image        String?
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  posts      Post[]
+  comments   Comment[]
+  likes      Like[]
+  sentMsgs   Message[]  @relation("sent_messages")
+  participants ConversationParticipant[]
+}
+
+model Post {
+  id         Int       @id @default(autoincrement())
+  parentId   Int?
+  parent     Post?     @relation("PostToPost", fields: [parentId], references: [id])
+  children   Post[]    @relation("PostToPost")
+  title      String
+  content    String
+  image      String?
+  shares     Int       @default(0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  userId  Int
+  user    User        @relation(fields: [userId], references: [id])
+  comments Comment[]
+  likes    Like[]
+
+  @@index([userId, createdAt])
+  @@index([parentId])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+
+  userId Int
+  user   User   @relation(fields: [userId], references: [id])
+
+  postId Int
+  post   Post   @relation(fields: [postId], references: [id])
+
+  @@index([postId, createdAt])
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  postId Int
+  post   Post @relation(fields: [postId], references: [id])
+
+  @@unique([userId, postId])
+  @@index([postId])
+}
+
+model Conversation {
+  id           Int                       @id @default(autoincrement())
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+  participants ConversationParticipant[]
+  messages     Message[]
+}
+
+model ConversationParticipant {
+  id             Int          @id @default(autoincrement())
+  conversationId Int
+  userId         Int
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  user           User         @relation(fields: [userId], references: [id])
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             Int          @id @default(autoincrement())
+  content        String
+  createdAt      DateTime     @default(now())
+  readAt         DateTime?
+
+  conversationId Int
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+
+  senderId Int
+  sender   User @relation("sent_messages", fields: [senderId], references: [id])
+
+  @@index([conversationId, createdAt])
+}

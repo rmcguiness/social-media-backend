@@ -1,0 +1,31 @@
+{
+	"name": "social-media-basic-backend",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "tsx watch src/server.ts",
+		"build": "tsc",
+		"start": "node dist/server.js",
+		"prisma:generate": "prisma generate",
+		"prisma:migrate": "prisma migrate dev",
+		"db:seed": "tsx prisma/seed.ts"
+	},
+	"dependencies": {
+		"@fastify/cors": "^10.0.0",
+		"@fastify/jwt": "^9.0.0",
+		"@fastify/rate-limit": "^9.0.0",
+		"@prisma/client": "^5.16.1",
+		"argon2": "^0.40.3",
+		"dotenv": "^16.4.5",
+		"fastify": "^4.28.1",
+		"fastify-type-provider-zod": "^1.1.10",
+		"zod": "^3.23.8"
+	},
+	"devDependencies": {
+		"@types/node": "^20.19.10",
+		"prisma": "^5.16.1",
+		"tsx": "^4.16.2",
+		"typescript": "^5.5.4"
+	}
+}

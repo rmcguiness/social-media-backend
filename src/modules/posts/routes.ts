@@ -1,4 +1,3 @@
-import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import type { FastifyPluginAsync } from 'fastify';
 import { createPostBody } from './schemas.js';
 import { postsService } from './service.js';
@@ -6,7 +5,6 @@ import { z } from 'zod';
 import { parsePagination } from '../../utils/pagination.js';
 
 const routes: FastifyPluginAsync = async (app) => {
-	app.withTypeProvider(ZodTypeProvider);
 
 	const svc = postsService(app);
 

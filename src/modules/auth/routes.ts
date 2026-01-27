@@ -2,11 +2,8 @@
 import { FastifyPluginAsync } from 'fastify';
 import { registerBody, loginBody } from './schemas.js';
 import { authService } from './service.js';
-import { Type } from '@sinclair/typebox';
-import { ZodTypeProvider } from 'fastify-type-provider-zod';
 
 const routes: FastifyPluginAsync = async (app) => {
-	app.withTypeProvider(ZodTypeProvider);
 
 	const svc = authService(app);
 

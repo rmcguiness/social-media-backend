@@ -1,11 +1,9 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { createConversationBody, createMessageBody } from './schemas.js';
 import { messagesService } from './service.js';
 import { parsePagination } from '../../utils/pagination.js';
 
 const routes: FastifyPluginAsync = async (app) => {
-	app.withTypeProvider(ZodTypeProvider);
 	const svc = messagesService(app);
 
 	app.get(

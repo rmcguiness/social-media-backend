@@ -1,5 +1,6 @@
 import Fastify from 'fastify';
-import { ZodTypeProvider } from 'fastify-type-provider-zod';
+import type { ZodTypeProvider } from 'fastify-type-provider-zod';
+import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 import prismaPlugin from './plugins/prisma.js';
 import authPlugin from './plugins/auth.js';
 import corsPlugin from './plugins/cors.js';
@@ -21,6 +22,9 @@ async function buildServer() {
 			level: 'info',
 		},
 	}).withTypeProvider<ZodTypeProvider>();
+
+	app.setValidatorCompiler(validatorCompiler);
+	app.setSerializerCompiler(serializerCompiler);
 
 	await app.register(prismaPlugin);
 	await app.register(corsPlugin);

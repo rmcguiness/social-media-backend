@@ -1,10 +1,8 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { likesService } from './service.js';
 import { likeToggleParams } from './schemas.js';
 
 const routes: FastifyPluginAsync = async (app) => {
-	app.withTypeProvider(ZodTypeProvider);
 	const svc = likesService(app);
 
 	app.post(

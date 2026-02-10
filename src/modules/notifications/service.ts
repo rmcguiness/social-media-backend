@@ -1,4 +1,4 @@
-import { db } from '@/config/db';
+import { prisma } from '@/utils/prisma';
 
 export type NotificationType = 'like' | 'comment';
 
@@ -28,7 +28,7 @@ export const notificationsService = {
    */
   async getForUser(userId: number, limit = 20): Promise<Notification[]> {
     // Get likes on user's posts
-    const likes = await db.like.findMany({
+    const likes = await prisma.like.findMany({
       where: {
         post: {
           userId,
@@ -61,7 +61,7 @@ export const notificationsService = {
     });
 
     // Get comments on user's posts
-    const comments = await db.comment.findMany({
+    const comments = await prisma.comment.findMany({
       where: {
         post: {
           userId,

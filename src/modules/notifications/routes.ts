@@ -1,33 +1,29 @@
-import { FastifyInstance } from 'fastify';
-import { notificationsService } from './service';
-import { authenticateUser } from '@/plugins/auth';
+import type { FastifyPluginAsync } from 'fastify';
+import { notificationsService } from './service.js';
 
-export async function notificationRoutes(fastify: FastifyInstance) {
-  /**
-   * GET /api/notifications
-   * Get notifications for the authenticated user
-   */
-  fastify.get(
-    '/api/notifications',
-    {
-      onRequest: [authenticateUser],
-    },
-    async (request, reply) => {
-      try {
-        const userId = request.user.id;
-        const limit = request.query.limit ? parseInt(request.query.limit as string, 10) : 20;
+const routes: FastifyPluginAsync = async (app) => {
+	/**
+	 * GET /api/notifications
+	 * Get notifications for the authenticated user
+	 */
+	app.get(
+		'/',
+		{
+			preHandler: [app.authenticate],
+		},
+		async (request, reply) => {
+			const userId = request.user.id;
+			const limit = (request.query as any).limit
+				? parseInt((request.query as any).limit as string, 10)
+				: 20;
 
-        const notifications = await notificationsService.getForUser(userId, limit);
+			const notifications = await notificationsService.getForUser(userId, limit);
 
-        return reply.send({
-          data: notifications,
-        });
-      } catch (error) {
-        fastify.log.error(error);
-        return reply.status(500).send({
-          error: 'Failed to fetch notifications',
-        });
-      }
-    }
-  );
-}
+			return reply.send({
+				data: notifications,
+			});
+		}
+	);
+};
+
+export default routes;

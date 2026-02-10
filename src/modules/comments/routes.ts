@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { createCommentBody } from './schemas.js';
+import { createCommentBody, type CreateCommentBody } from './schemas.js';
 import { commentsService } from './service.js';
 import { parsePagination } from '../../utils/pagination.js';
 
@@ -21,7 +21,7 @@ const routes: FastifyPluginAsync = async (app) => {
 			// @ts-ignore
 			const user = req.user as { id: number };
 			const postId = Number((req.params as any).postId);
-			const created = await svc.create(user.id, postId, req.body);
+			const created = await svc.create(user.id, postId, req.body as CreateCommentBody);
 			return reply.code(201).send(created);
 		}
 	);

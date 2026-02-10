@@ -13,7 +13,7 @@ import postRoutes from './modules/posts/routes.js';
 import commentRoutes from './modules/comments/routes.js';
 import likeRoutes from './modules/likes/routes.js';
 import messageRoutes from './modules/messages/routes.js';
-import { notificationRoutes } from './modules/notifications/routes.js';
+import notificationRoutes from './modules/notifications/routes.js';
 
 async function buildServer() {
 	const app = Fastify({
@@ -40,7 +40,7 @@ async function buildServer() {
 	await app.register(commentRoutes, { prefix: '/api/comments' });
 	await app.register(likeRoutes, { prefix: '/api/likes' });
 	await app.register(messageRoutes, { prefix: '/api' });
-	await app.register(notificationRoutes);
+	await app.register(notificationRoutes, { prefix: '/api/notifications' });
 
 	return app;
 }

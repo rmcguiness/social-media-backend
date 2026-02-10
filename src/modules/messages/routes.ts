@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { createConversationBody, createMessageBody } from './schemas.js';
+import { createConversationBody, createMessageBody, type CreateConversationBody, type CreateMessageBody } from './schemas.js';
 import { messagesService } from './service.js';
 import { parsePagination } from '../../utils/pagination.js';
 
@@ -26,7 +26,7 @@ const routes: FastifyPluginAsync = async (app) => {
 		async (req, reply) => {
 			// @ts-ignore
 			const user = req.user as { id: number };
-			const conv = await svc.createConversation(user.id, req.body);
+			const conv = await svc.createConversation(user.id, req.body as CreateConversationBody);
 			return reply.code(201).send(conv);
 		}
 	);
@@ -49,7 +49,7 @@ const routes: FastifyPluginAsync = async (app) => {
 			// @ts-ignore
 			const user = req.user as { id: number };
 			const conversationId = Number((req.params as any).id);
-			const m = await svc.sendMessage(user.id, conversationId, req.body);
+			const m = await svc.sendMessage(user.id, conversationId, req.body as CreateMessageBody);
 			return reply.code(201).send(m);
 		}
 	);

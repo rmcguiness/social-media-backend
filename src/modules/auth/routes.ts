@@ -1,6 +1,6 @@
 // backend/nodejs/social-media-basic/src/modules/auth/routes.ts
 import { FastifyPluginAsync } from 'fastify';
-import { registerBody, loginBody } from './schemas.js';
+import { registerBody, loginBody, type RegisterBody, type LoginBody } from './schemas.js';
 import { authService } from './service.js';
 
 const routes: FastifyPluginAsync = async (app) => {
@@ -11,13 +11,13 @@ const routes: FastifyPluginAsync = async (app) => {
 		'/register',
 		{ schema: { body: registerBody } },
 		async (req, reply) => {
-			const result = await svc.register(req.body);
+			const result = await svc.register(req.body as RegisterBody);
 			return reply.send(result);
 		}
 	);
 
 	app.post('/login', { schema: { body: loginBody } }, async (req, reply) => {
-		const result = await svc.login(req.body);
+		const result = await svc.login(req.body as LoginBody);
 		return reply.send(result);
 	});
 

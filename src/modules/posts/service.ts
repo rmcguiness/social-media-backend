@@ -49,6 +49,26 @@ export function postsService(app: FastifyInstance) {
 			return toFrontendPost(p);
 		},
 
+		async update(userId: number, id: number, input: Partial<CreatePostBody>) {
+			const post = await prisma.post.findUnique({ where: { id } });
+			if (!post) throw new Error('Not found');
+			if (post.userId !== userId) throw new Error('Forbidden');
+			
+			const updated = await prisma.post.update({
+				where: { id },
+				data: {
+					...(input.title !== undefined && { title: input.title }),
+					...(input.content !== undefined && { content: input.content }),
+					...(input.image !== undefined && { image: input.image }),
+				},
+				include: {
+					user: true,
+					_count: { select: { comments: true, likes: true } },
+				},
+			});
+			return toFrontendPost(updated);
+		},
+
 		async remove(userId: number, id: number) {
 			const post = await prisma.post.findUnique({ where: { id } });
 			if (!post) throw new Error('Not found');

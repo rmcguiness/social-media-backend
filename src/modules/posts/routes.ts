@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { createPostBody } from './schemas.js';
+import { createPostBody, type CreatePostBody } from './schemas.js';
 import { postsService } from './service.js';
 import { z } from 'zod';
 import { parsePagination } from '../../utils/pagination.js';
@@ -27,8 +27,20 @@ const routes: FastifyPluginAsync = async (app) => {
 		async (req, reply) => {
 			// @ts-ignore
 			const user = req.user as { id: number };
-			const created = await svc.create(user.id, req.body);
+			const created = await svc.create(user.id, req.body as CreatePostBody);
 			return reply.code(201).send(created);
+		}
+	);
+
+	app.put(
+		'/:id',
+		{ preHandler: [app.authenticate], schema: { body: createPostBody.partial() } },
+		async (req, reply) => {
+			// @ts-ignore
+			const user = req.user as { id: number };
+			const id = Number((req.params as any).id);
+			const updated = await svc.update(user.id, id, req.body as Partial<CreatePostBody>);
+			return reply.send(updated);
 		}
 	);
 

@@ -1,0 +1,145 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  username     String   @unique
+  name         String
+  bio          String?
+  image        String?
+  coverImage   String?
+  passwordHash String
+  emailVerified Boolean  @default(false)
+  emailVerifiedAt DateTime?
+  notificationPreferences Json?
+  privacySettings Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  posts         Post[]
+  comments      Comment[]
+  likes         Like[]
+  sentMsgs      Message[]  @relation("sent_messages")
+  participants  ConversationParticipant[]
+  refreshTokens RefreshToken[]
+}
+
+model UnconfirmedUser {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  username     String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  @@index([email])
+  @@map("unconfirmed_users")
+}
+
+model Post {
+  id         Int       @id @default(autoincrement())
+  parentId   Int?
+  parent     Post?     @relation("PostToPost", fields: [parentId], references: [id])
+  children   Post[]    @relation("PostToPost")
+  title      String
+  content    String
+  image      String?
+  shares     Int       @default(0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  userId  Int
+  user    User        @relation(fields: [userId], references: [id])
+  comments Comment[]
+  likes    Like[]
+
+  @@index([userId, createdAt])
+  @@index([parentId])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+
+  userId Int
+  user   User   @relation(fields: [userId], references: [id])
+
+  postId Int
+  post   Post   @relation(fields: [postId], references: [id])
+
+  parentId Int?
+  parent   Comment?  @relation("CommentToComment", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  Comment[] @relation("CommentToComment")
+
+  @@index([postId, createdAt])
+  @@index([parentId])
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  postId Int
+  post   Post @relation(fields: [postId], references: [id])
+
+  @@unique([userId, postId])
+  @@index([postId])
+}
+
+model Conversation {
+  id           Int                       @id @default(autoincrement())
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+  participants ConversationParticipant[]
+  messages     Message[]
+}
+
+model ConversationParticipant {
+  id             Int          @id @default(autoincrement())
+  conversationId Int
+  userId         Int
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  user           User         @relation(fields: [userId], references: [id])
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             Int          @id @default(autoincrement())
+  content        String
+  createdAt      DateTime     @default(now())
+  readAt         DateTime?
+
+  conversationId Int
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+
+  senderId Int
+  sender   User @relation("sent_messages", fields: [senderId], references: [id])
+
+  @@index([conversationId, createdAt])
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([tokenHash])
+}

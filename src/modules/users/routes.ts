@@ -6,6 +6,14 @@ import { parsePagination } from '../../utils/pagination.js';
 const routes: FastifyPluginAsync = async (app) => {
 	const svc = usersService(app);
 
+	// Get user by username
+	app.get('/username/:username', async (req, reply) => {
+		const username = (req.params as any).username;
+		const user = await svc.getByUsername(username);
+		if (!user) return reply.code(404).send({ message: 'User not found' });
+		return reply.send(user);
+	});
+
 	app.get('/:id', async (req, reply) => {
 		const id = Number((req.params as any).id);
 		const user = await svc.get(id);

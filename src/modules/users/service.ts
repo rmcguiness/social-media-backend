@@ -24,6 +24,21 @@ export function usersService(app: FastifyInstance) {
 			});
 		},
 
+		async getByUsername(username: string) {
+			return prisma.user.findUnique({
+				where: { username },
+				select: { 
+					id: true, 
+					username: true, 
+					name: true, 
+					image: true,
+					bio: true,
+					coverImage: true,
+					createdAt: true,
+				},
+			});
+		},
+
 		async search(q: string | undefined, limit: number, cursor?: number) {
 			const users = await prisma.user.findMany({
 				where: q
